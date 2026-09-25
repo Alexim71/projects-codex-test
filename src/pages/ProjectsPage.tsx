@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import './ProjectsPage.css'
 
 type Project = {
@@ -70,13 +70,10 @@ function ProjectsPage() {
     }
   }, [projects])
 
-  const filteredProjects = useMemo(() => {
-    const normalizedQuery = query.trim().toLocaleLowerCase()
-    if (!normalizedQuery) return projects
-    return projects.filter((project) =>
-      project.name.toLocaleLowerCase().includes(normalizedQuery),
-    )
-  }, [projects, query])
+  const normalizedQuery = query.trim().toLowerCase()
+  const filteredProjects = normalizedQuery
+    ? projects.filter((project) => project.name.toLowerCase().includes(normalizedQuery))
+    : projects
 
   function resetForm() {
     setForm({ name: '', description: '' })
@@ -92,10 +89,13 @@ function ProjectsPage() {
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length > 0) return
 
-    setProjects((current) => [
-      { id: makeProjectId(), name: form.name.trim(), description: form.description.trim() },
-      ...current,
-    ])
+    const newProject = {
+      id: makeProjectId(),
+      name: form.name.trim(),
+      description: form.description.trim(),
+    }
+    setProjects((current) => [newProject, ...current])
+    setQuery('')
     resetForm()
   }
 
@@ -215,3 +215,4 @@ function ProjectsPage() {
 }
 
 export default ProjectsPage
+
